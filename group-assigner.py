@@ -1,19 +1,10 @@
-import random
+import argparse
 import json
 import os
 from collections import defaultdict
 import csv
 
 class GroupAssigner:
-    # def __init__(self, filename="group_data.json", students_file="students.txt"):
-    #     self.students = self.load_students(students_file)
-    #     self.pair_count = defaultdict(lambda: defaultdict(int))
-    #     self.filename = filename
-        
-    #     # Load existing data if the file exists
-    #     if os.path.exists(self.filename):
-    #         self.load_data()
-
     def __init__(self, filename="group_data.json", students_file="students.txt"):
         self.students = self.load_students(students_file)
         self.pair_count = defaultdict(lambda: defaultdict(int))
@@ -84,31 +75,6 @@ class GroupAssigner:
             for partner, count in partners.items():
                 print(f"{student} has worked with {partner} {count} times.")
 
-    # def save_data(self, new_groups):
-    #     # Append new groups to existing data
-    #     if os.path.exists(self.filename):
-    #         with open(self.filename, "r") as file:
-    #             data = json.load(file)
-    #     else:
-    #         data = {"groups": [], "pair_count": {}}
-
-    #     # Append the new group to the sequence of group runs
-    #     data["groups"].append(new_groups)
-        
-    #     # Update pair counts in the file
-    #     for student, partners in self.pair_count.items():
-    #         if student not in data["pair_count"]:
-    #             data["pair_count"][student] = {}
-    #         for partner, count in partners.items():
-    #             if partner in data["pair_count"][student]:
-    #                 data["pair_count"][student][partner] += count
-    #             else:
-    #                 data["pair_count"][student][partner] = count
-
-    #     # Save updated data back to the file
-    #     with open(self.filename, "w") as file:
-    #         json.dump(data, file, indent=4)
-
     def save_data(self, new_groups):
         if os.path.exists(self.filename):
             with open(self.filename, "r") as file:
@@ -123,16 +89,6 @@ class GroupAssigner:
 
         with open(self.filename, "w") as file:
             json.dump(data, file, indent=4)
-
-
-
-    # def load_data(self):
-    #     with open(self.filename, "r") as file:
-    #         data = json.load(file)
-            
-    #         # Initialize pair_count with defaultdicts
-    #         for student, partners in data["pair_count"].items():
-    #             self.pair_count[student] = defaultdict(int, partners)
 
     def load_data(self):
         with open(self.filename, "r") as file:
@@ -184,30 +140,22 @@ class GroupAssigner:
                 return data["groups"]
         return []
 
-
-
-
-
 def main():
-    # Initialize the GroupAssigner with the specified files
+    parser = argparse.ArgumentParser(description="Form student groups and track pair counts.")
+    parser.add_argument("group_size", type=int, help="Number of students per group")
+    
+    args = parser.parse_args()
+    group_size = args.group_size
+    
     assigner = GroupAssigner(filename="group_data.json", students_file="students.txt")
     
-    # Form groups of a specific size (e.g., 3 students per group)
-    group_size = 4
-    groups = assigner.form_groups(group_size=group_size)
+    groups = assigner.form_groups(group_size)
     
-    # Print the formed groups
-    print("Groups:", groups)
+    print("Groups formed:")
+    for group in groups:
+        print(", ".join(group))
     
-    # Print how many times each student has worked with others
-    assigner.print_pair_counts()
-
-    # Generate the CSV output for pair counts
-    assigner.generate_pair_count_csv()
-
-    # Save the groups to a text file
     assigner.save_groups_to_text()
-
 
 if __name__ == "__main__":
     main()
