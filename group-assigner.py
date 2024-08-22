@@ -157,5 +157,7 @@ def main():
     
     assigner.save_groups_to_text()
 
+    assigner.generate_pair_count_csv()
+
 if __name__ == "__main__":
     main()
